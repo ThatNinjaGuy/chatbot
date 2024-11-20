@@ -31,9 +31,10 @@ To get started with the Grok Chatbot, follow these steps:
 
 1. **Clone the Repository**: Clone this repository to your local machine using `git clone <repository-url>`.
 2. **Install Dependencies**: Navigate to the project directory and run `npm install` to install all necessary dependencies.
-3. **Configure the Server**: Ensure the server configuration in `config.js` is set up correctly, including the client origin, server port, and API keys for OpenAI and Pinecone.
-4. **Start the Server**: Run `npm run server` to start the Express server.
-5. **Start the Client**: In a separate terminal, navigate to the client directory and run `npm start` to launch the React application in development mode. Open [http://localhost:3000](http://localhost:3000) in your browser to view the chatbot.
+3. **Configure Environment Variables**: Copy the `.env.example` file to a new file named `.env` and fill in your configuration details, including the server port and API keys for OpenAI and Pinecone.
+4. **Configure the Server**: Ensure the server configuration in `config.js` is set up correctly, including the client origin and server port.
+5. **Start the Server**: Run `npm run server` to start the Express server.
+6. **Start the Client**: In a separate terminal, navigate to the client directory and run `npm start` to launch the React application in development mode. Open [http://localhost:3000](http://localhost:3000) in your browser to view the chatbot.
 
 ## Usage
 
