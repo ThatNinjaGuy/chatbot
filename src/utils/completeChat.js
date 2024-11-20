@@ -1,35 +1,25 @@
+const SERVER_HOST = process.env.REACT_APP_SERVER_HOST || "http://localhost";
+const SERVER_PORT = process.env.REACT_APP_SERVER_PORT || "8080";
+
 export async function completeChat(input) {
   try {
-    const response = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          "Bearer xai-qGHQ2xobYZb7HpvzkVdfXEMCazh13Zjvd8QHoxUaMw6h5GAVy6UYLBYTMsaqMn5MlBoJXeo6FECmStgO",
-      },
-      body: JSON.stringify({
-        messages: [
-          {
-            role: "system",
-            content: "You are a test assistant.",
-          },
-          {
-            role: "user",
-            content: input,
-          },
-        ],
-        model: "grok-beta",
-        stream: false,
-        temperature: 0,
-      }),
-    });
+    const response = await fetch(
+      `${SERVER_HOST}:${SERVER_PORT}/api/complete-chat`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ input }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
 
     const data = await response.json();
-    return data.choices[0].message.content; // Adjust based on actual API response structure
+    return data.message; // Adjust based on actual server response structure
   } catch (error) {
     console.error("Error fetching AI response:", error);
     throw error;

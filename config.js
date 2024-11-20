@@ -6,4 +6,6 @@ export const config = {
   pineconeIndexName: process.env.PINECONE_INDEX_NAME,
   clientOrigin: "http://localhost:3000",
   serverPort: process.env.SERVER_PORT || 8080,
+  xaiApiKey: process.env.XAI_API_KEY,
+  mode: process.env.MODE || "demo",
 };
