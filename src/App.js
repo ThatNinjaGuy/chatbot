@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import "./App.css";
-import Header from "./components/Header";
-import ChatMessage from "./components/ChatMessage";
-import ChatInput from "./components/ChatInput";
-import KnowledgeBase from "./components/KnowledgeBase";
-import { completeChat } from "./utils/completeChat";
-// import { createEmbeddings } from "./utils/createEmbeddings";
-import { upsertVectors } from "./utils/pineconeClient";
+import Header from "./components/Header.js";
+import ChatMessage from "./components/ChatMessage.js";
+import ChatInput from "./components/ChatInput.js";
+import KnowledgeBase from "./components/KnowledgeBase.js";
+import { completeChat } from "./utils/completeChat.js";
+import { createEmbeddings } from "./utils/createEmbeddings.js";
+import { upsertVectors } from "./utils/pineconeClient.js";
 
 function App() {
   const [theme, setTheme] = useState("light");
@@ -14,6 +14,7 @@ function App() {
   const [input, setInput] = useState("");
   const [isChatScreen, setIsChatScreen] = useState(true);
   const [knowledgeInput, setKnowledgeInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
@@ -28,9 +29,10 @@ function App() {
   };
 
   const handleChatSend = async () => {
-    if (input.trim()) {
+    if (input.trim() && !isLoading) {
       setChatHistory([...chatHistory, { user: "User", message: input }]);
       setInput("");
+      setIsLoading(true);
 
       try {
         const aiResponse = await completeChat(input);
@@ -46,27 +48,27 @@ function App() {
             message: "Sorry, there was an error fetching the response.",
           },
         ]);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleKnowledgeBaseAction = async () => {
     if (knowledgeInput.trim()) {
+      setIsLoading(true);
       try {
-        // Temporarily using dummy data while embeddings API is not working
-        // const embeddings = await createEmbeddings(knowledgeInput);
-        // console.log("Generated embeddings:", embeddings);
-
-        // Create dummy embedding vector (1024 dimensions with random values)
-        const dummyEmbedding = Array(50)
-          .fill(0)
-          .map(() => Math.random());
+        // Generate embeddings using OpenAI API
+        const embeddings = await createEmbeddings(knowledgeInput);
 
         const vectors = [
           {
-            id: "vec1",
-            values: dummyEmbedding,
-            metadata: { genre: "unknown" },
+            id: `vec-${Date.now()}`, // Use a unique ID for each vector
+            values: embeddings, // Use the embeddings from OpenAI
+            metadata: {
+              genre: "unknown",
+              originalText: knowledgeInput,
+            },
           },
         ];
 
@@ -75,12 +77,14 @@ function App() {
         setKnowledgeInput("");
       } catch (error) {
         console.error("Error generating embeddings:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isLoading) {
       if (isChatScreen) {
         handleChatSend();
       } else {
@@ -102,7 +106,9 @@ function App() {
         toggleScreen={toggleScreen}
       />
       <main className="App-main">
-        {isChatScreen ? (
+        {isLoading && !isChatScreen ? (
+          <div className="loading-screen">Loading...</div>
+        ) : isChatScreen ? (
           chatHistory.map((chat, index) => (
             <ChatMessage key={index} chat={chat} />
           ))
@@ -121,6 +127,7 @@ function App() {
           handleInputChange={handleInputChange}
           handleKeyDown={handleKeyDown}
           handleSend={handleChatSend}
+          disabled={isLoading}
         />
       )}
     </div>

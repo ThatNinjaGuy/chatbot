@@ -4,8 +4,8 @@ export async function completeChat(input) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Authorization:
-        //   "Bearer xai-qGHQ2xobYZb7HpvzkVdfXEMCazh13Zjvd8QHoxUaMw6h5GAVy6UYLBYTMsaqMn5MlBoJXeo6FECmStgO",
+        Authorization:
+          "Bearer xai-qGHQ2xobYZb7HpvzkVdfXEMCazh13Zjvd8QHoxUaMw6h5GAVy6UYLBYTMsaqMn5MlBoJXeo6FECmStgO",
       },
       body: JSON.stringify({
         messages: [

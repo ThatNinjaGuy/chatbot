@@ -1,6 +1,12 @@
 import React from "react";
 
-function ChatInput({ input, handleInputChange, handleKeyDown, handleSend }) {
+function ChatInput({
+  input,
+  handleInputChange,
+  handleKeyDown,
+  handleSend,
+  disabled,
+}) {
   return (
     <footer className="App-footer">
       <input
@@ -9,8 +15,11 @@ function ChatInput({ input, handleInputChange, handleKeyDown, handleSend }) {
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         placeholder="Type your message..."
+        disabled={disabled}
       />
-      <button onClick={handleSend}>Send</button>
+      <button onClick={handleSend} disabled={disabled}>
+        Send
+      </button>
     </footer>
   );
 }

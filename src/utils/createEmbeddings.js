@@ -1,27 +1,24 @@
-export async function createEmbeddings(text) {
+export const createEmbeddings = async (inputText) => {
   try {
-    const response = await fetch("https://api.x.ai/v1/embeddings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Authorization:
-        //   "Bearer xai-qGHQ2xobYZb7HpvzkVdfXEMCazh13Zjvd8QHoxUaMw6h5GAVy6UYLBYTMsaqMn5MlBoJXeo6FECmStgO",
-      },
-      body: JSON.stringify({
-        input: [text],
-        model: "v1",
-        encoding_format: "float",
-      }),
-    });
+    const response = await fetch(
+      "http://localhost:8080/api/create-embeddings",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputText }),
+      }
+    );
 
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      throw new Error("Failed to create embeddings");
     }
 
     const data = await response.json();
-    return data.embeddings; // Adjust based on actual API response structure
+    return data.embedding;
   } catch (error) {
-    console.error("Error generating embeddings:", error);
+    console.error("Error creating embeddings:", error);
     throw error;
   }
-}
+};
