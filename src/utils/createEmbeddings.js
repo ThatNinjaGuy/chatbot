@@ -1,7 +1,10 @@
+const SERVER_HOST = process.env.REACT_APP_SERVER_HOST || "http://localhost";
+const SERVER_PORT = process.env.REACT_APP_SERVER_PORT || "8080";
+
 export const createEmbeddings = async (inputText) => {
   try {
     const response = await fetch(
-      "http://localhost:8080/api/create-embeddings",
+      `${SERVER_HOST}:${SERVER_PORT}/api/create-embeddings`,
       {
         method: "POST",
         headers: {
