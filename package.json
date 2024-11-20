@@ -1,50 +1,14 @@
 {
-  "name": "grok",
+  "name": "grok-fullstack",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@pinecone-database/pinecone": "^4.0.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "openai": "^4.73.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-markdown": "^9.0.1",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
   "scripts": {
-    "start": "PORT=3000 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "server": "node server.js"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "install": "npm install --prefix frontend && npm install --prefix backend",
+    "start": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend\"",
+    "build": "npm run build --prefix frontend",
+    "test": "npm test --prefix frontend"
   },
   "devDependencies": {
-    "source-map-loader": "^5.0.0"
-  },
-  "type": "module",
-  "proxy": "http://localhost:8080"
+    "concurrently": "^7.0.0"
+  }
 }
