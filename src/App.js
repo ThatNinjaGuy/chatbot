@@ -3,11 +3,17 @@ import "./App.css";
 import Header from "./components/Header";
 import ChatMessage from "./components/ChatMessage";
 import ChatInput from "./components/ChatInput";
+import KnowledgeBase from "./components/KnowledgeBase";
+import { completeChat } from "./utils/completeChat";
+// import { createEmbeddings } from "./utils/createEmbeddings";
+import { upsertVectors } from "./utils/pineconeClient";
 
 function App() {
   const [theme, setTheme] = useState("light");
   const [chatHistory, setChatHistory] = useState([]);
   const [input, setInput] = useState("");
+  const [isChatScreen, setIsChatScreen] = useState(true);
+  const [knowledgeInput, setKnowledgeInput] = useState("");
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
@@ -17,47 +23,22 @@ function App() {
     setInput(e.target.value);
   };
 
-  const handleSend = async () => {
+  const handleKnowledgeInputChange = (e) => {
+    setKnowledgeInput(e.target.value);
+  };
+
+  const handleChatSend = async () => {
     if (input.trim()) {
       setChatHistory([...chatHistory, { user: "User", message: input }]);
       setInput("");
 
       try {
-        const response = await fetch("https://api.x.ai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // Authorization:
-            //   "Bearer xai-qGHQ2xobYZb7HpvzkVdfXEMCazh13Zjvd8QHoxUaMw6h5GAVy6UYLBYTMsaqMn5MlBoJXeo6FECmStgO",
-          },
-          body: JSON.stringify({
-            messages: [
-              {
-                role: "system",
-                content: "Answer my questions as best as you can.",
-              },
-              {
-                role: "user",
-                content: input,
-              },
-            ],
-            model: "grok-beta",
-            stream: false,
-            temperature: 0,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
+        const aiResponse = await completeChat(input);
         setChatHistory((prevHistory) => [
           ...prevHistory,
-          { user: "AI", message: data.choices[0].message.content },
+          { user: "AI", message: aiResponse },
         ]);
       } catch (error) {
-        console.error("Error fetching AI response:", error);
         setChatHistory((prevHistory) => [
           ...prevHistory,
           {
@@ -69,26 +50,79 @@ function App() {
     }
   };
 
+  const handleKnowledgeBaseAction = async () => {
+    if (knowledgeInput.trim()) {
+      try {
+        // Temporarily using dummy data while embeddings API is not working
+        // const embeddings = await createEmbeddings(knowledgeInput);
+        // console.log("Generated embeddings:", embeddings);
+
+        // Create dummy embedding vector (1024 dimensions with random values)
+        const dummyEmbedding = Array(50)
+          .fill(0)
+          .map(() => Math.random());
+
+        const vectors = [
+          {
+            id: "vec1",
+            values: dummyEmbedding,
+            metadata: { genre: "unknown" },
+          },
+        ];
+
+        await upsertVectors(vectors);
+
+        setKnowledgeInput("");
+      } catch (error) {
+        console.error("Error generating embeddings:", error);
+      }
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      handleSend();
+      if (isChatScreen) {
+        handleChatSend();
+      } else {
+        handleKnowledgeBaseAction();
+      }
     }
+  };
+
+  const toggleScreen = () => {
+    setIsChatScreen(!isChatScreen);
   };
 
   return (
     <div className={`App ${theme}`}>
-      <Header theme={theme} toggleTheme={toggleTheme} />
-      <main className="App-main">
-        {chatHistory.map((chat, index) => (
-          <ChatMessage key={index} chat={chat} />
-        ))}
-      </main>
-      <ChatInput
-        input={input}
-        handleInputChange={handleInputChange}
-        handleKeyDown={handleKeyDown}
-        handleSend={handleSend}
+      <Header
+        theme={theme}
+        toggleTheme={toggleTheme}
+        isChatScreen={isChatScreen}
+        toggleScreen={toggleScreen}
       />
+      <main className="App-main">
+        {isChatScreen ? (
+          chatHistory.map((chat, index) => (
+            <ChatMessage key={index} chat={chat} />
+          ))
+        ) : (
+          <KnowledgeBase
+            knowledgeInput={knowledgeInput}
+            handleKnowledgeInputChange={handleKnowledgeInputChange}
+            handleKnowledgeBaseAction={handleKnowledgeBaseAction}
+            handleKeyDown={handleKeyDown}
+          />
+        )}
+      </main>
+      {isChatScreen && (
+        <ChatInput
+          input={input}
+          handleInputChange={handleInputChange}
+          handleKeyDown={handleKeyDown}
+          handleSend={handleChatSend}
+        />
+      )}
     </div>
   );
 }
