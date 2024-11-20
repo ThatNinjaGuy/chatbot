@@ -109,9 +109,16 @@ function App() {
         {isLoading && !isChatScreen ? (
           <div className="loading-screen">Loading...</div>
         ) : isChatScreen ? (
-          chatHistory.map((chat, index) => (
-            <ChatMessage key={index} chat={chat} />
-          ))
+          chatHistory.length === 0 ? (
+            <div className="welcome-message">
+              Welcome to Grok Chatbot! Start a conversation by typing a message
+              below.
+            </div>
+          ) : (
+            chatHistory.map((chat, index) => (
+              <ChatMessage key={index} chat={chat} />
+            ))
+          )
         ) : (
           <KnowledgeBase
             knowledgeInput={knowledgeInput}
